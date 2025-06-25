@@ -1,6 +1,25 @@
 import express from 'express';
+import birds from './routes/birds.js';
+
 const app = express();
 const port = 3000;
+
+// ###########################################################
+
+function beforeAnything(req, res, next) {
+    req.timeStart = Date.now();
+    next();
+}
+
+function beforeAnything2(req, res, next) {
+    req.middlewareText = 'Hello from the middle... :P';
+    next();
+}
+
+app.use(beforeAnything);
+app.use(beforeAnything2);
+
+// ###########################################################
 
 app.use(express.static('public'));
 
@@ -27,9 +46,121 @@ app.get('/', (req, res) => {
         </html>`);
 });
 
+// ###########################################################
+
+app.get('/middle', (req, res) => {
+    console.log('Uztruko (ms):', Date.now() - req.timeStart);
+
+    res.json({
+        time: req.timeStart,
+        end: Date.now(),
+        diff: Date.now() - req.timeStart,
+        text: req.middlewareText,
+    });
+});
+
+// ###########################################################
+
+app.use('/birds', birds);
+
+// ###########################################################
+
+function pirmas(req, res, next) {
+    console.log('pirma console...');
+    if (Math.random() > 0.2) {
+        next();
+    } else {
+        next('route');
+    }
+}
+
+function antras(req, res, next) {
+    console.log('antra console...');
+    if (Math.random() > 0.2) {
+        next();
+    } else {
+        next('route');
+    }
+}
+
+function trecias(req, res, next) {
+    console.log('trecia console...');
+    if (Math.random() > 0.2) {
+        next();
+    } else {
+        next('route');
+    }
+}
+
+function ketvirtas(req, res, next) {
+    console.log('ketvirta console...');
+    if (Math.random() > 0.2) {
+        next();
+    } else {
+        next('route');
+    }
+}
+
+function nuoIki(req, res, next) {
+    console.log('PIRMAS');
+    if (Math.random() > 0.9) {
+        return next();
+    }
+
+    console.log('ANTRAS');
+    if (Math.random() > 0.8) {
+        return next();
+    }
+
+    console.log('TRECIAS');
+    if (Math.random() > 0.7) {
+        return next();
+    }
+
+    console.log('KETVIRTAS');
+    if (Math.random() > 0.6) {
+        return next();
+    }
+
+    return next();
+}
+
+function penktas(req, res, next) {
+    console.log('penkta console...');
+    res.send('penktas responsive...');
+}
+
+const kaDaryti = [pirmas, antras];
+
+app.get('/pirmadienis', kaDaryti, trecias, ketvirtas);
+app.get('/pirmadienis', nuoIki);
+app.get('/pirmadienis', penktas);
+
+// ###########################################################
+
 app.get('/about', (req, res) => {
     res.send('About page!');
 });
+
+// ###########################################################
+
+const gautiKebaba = (req, res) => res.send('Stai tavo kebabas!');
+const pagamintiKebaba = (req, res) => res.send('Tavo kebabas pagamintas!');
+const pasildytiKebaba = (req, res) => res.send('Tavo kebabas pasildytas!');
+const ismestiKebaba = (req, res) => res.send('😬😬😬');
+
+app.route('/kebabas')
+    .get(gautiKebaba)
+    .post(pagamintiKebaba)
+    .put(pasildytiKebaba)
+    .delete(ismestiKebaba);
+
+// app.get('/kebabas', gautiKebaba);
+// app.post('/kebabas', pagamintiKebaba);
+// app.put('/kebabas', pasildytiKebaba);
+// app.delete('/kebabas', ismestiKebaba);
+
+// ###########################################################
 
 app.all('/secret', (req, res, next) => {
     console.log('Accessing the secret section ...');
