@@ -2,7 +2,7 @@ import express from 'express';
 import birds from './routes/birds.js';
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // ###########################################################
 
@@ -45,6 +45,17 @@ app.get('/', (req, res) => {
         </body>
         </html>`);
 });
+
+// ###########################################################
+
+app.get('/api', (req, res) => {
+    console.log('API request...');
+
+    res.json({
+        success: true,
+        time: Date.now(),
+    });
+})
 
 // ###########################################################
 
